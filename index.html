@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Website AI Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-black to-gray-800 min-h-screen flex items-center justify-center text-white">
+
+  <div class="w-full max-w-3xl p-8 bg-gray-900/80 backdrop-blur-lg rounded-2xl shadow-2xl">
+
+    <!-- Header -->
+    <h1 class="text-3xl font-bold text-center mb-2">🔗 Website AI Chatbot</h1>
+    <p class="text-center text-gray-400 mb-6">Ask questions from any website using AI (RAG-based)</p>
+
+    <!-- Input Section -->
+    <div class="space-y-4">
+      <input
+        id="url"
+        type="url"
+        placeholder="Enter website URL (https://example.com)"
+        class="w-full px-4 py-3 rounded-xl bg-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none"
+      />
+
+      <textarea
+        id="query"
+        rows="3"
+        placeholder="Ask your question..."
+        class="w-full px-4 py-3 rounded-xl bg-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none"
+      ></textarea>
+
+      <button
+        onclick="askQuestion()"
+        class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition font-semibold"
+      >
+        Ask
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="hidden text-center mt-6 text-indigo-400">⏳ Processing website data...</div>
+
+    <!-- Answer -->
+    <div id="answerBox" class="hidden mt-6 p-4 rounded-xl bg-gray-800 border border-gray-700">
+      <h3 class="font-semibold mb-2 text-indigo-400">Answer:</h3>
+      <p id="answer" class="text-gray-200 whitespace-pre-line"></p>
+    </div>
+
+  </div>
+
+  <script>
+    async function askQuestion() {
+      const url = document.getElementById('url').value;
+      const query = document.getElementById('query').value;
+      const loading = document.getElementById('loading');
+      const answerBox = document.getElementById('answerBox');
+      const answer = document.getElementById('answer');
+
+      if (!url || !query) {
+        alert('Please enter both website URL and question');
+        return;
+      }
+
+      loading.classList.remove('hidden');
+      answerBox.classList.add('hidden');
+
+      try {
+        const response = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, query })
+        });
+
+        const data = await response.json();
+        answer.textContent = data.answer || data.error;
+        answerBox.classList.remove('hidden');
+      } catch (err) {
+        answer.textContent = 'Something went wrong.';
+        answerBox.classList.remove('hidden');
+      }
+
+      loading.classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>
